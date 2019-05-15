@@ -330,21 +330,25 @@ class BouncyAdapter extends RecyclerView.Adapter implements SpringScroller.Sprin
 
                 // return true so that RecyclerView won't scroll when the user scroll.
                 // We scroll it using scrollBy().
-                return shouldInterceptTouch();
+                if (shouldInterceptTouch()) {
+                    mGestureOnIntercept = false;
+                    mGestureDetector.onTouchEvent(e);
+
+                    switch (e.getAction()) {
+                        case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_CANCEL:
+                            mGestureOnIntercept = true;
+                            onActionUp();
+                            break;
+                    }
+                }
+
+                return false;
             }
 
             @Override
             public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-                mGestureOnIntercept = false;
-                mGestureDetector.onTouchEvent(e);
 
-                switch (e.getAction()) {
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        mGestureOnIntercept = true;
-                        onActionUp();
-                        break;
-                }
             }
         });
     }
